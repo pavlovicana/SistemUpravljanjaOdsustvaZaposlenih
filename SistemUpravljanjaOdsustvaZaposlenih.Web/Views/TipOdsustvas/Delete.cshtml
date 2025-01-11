@@ -1,0 +1,32 @@
+﻿@model SistemUpravljanjaOdsustvaZaposlenih.Web.Data.TipOdsustva
+
+@{
+    ViewData["Title"] = "Obrisi rekord iz tabele";
+}
+
+<h1>Obrisi</h1>
+
+<h3>Da li ste sigurni da zelite da obrisete rekord?</h3>
+<div>
+    <hr />
+    <dl class="row">
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Ime)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Ime)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.BrojDana)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.BrojDana)
+        </dd>
+    </dl>
+    
+    <form asp-action="Delete">
+        <input type="hidden" asp-for="Id" />
+        <input type="submit" value="Delete" class="btn btn-danger" />
+        <a asp-action="Index" class="btn btn-primary">Back to List</a>
+    </form>
+</div>

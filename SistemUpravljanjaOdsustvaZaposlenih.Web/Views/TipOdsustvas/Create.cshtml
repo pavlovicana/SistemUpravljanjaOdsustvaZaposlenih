@@ -1,0 +1,38 @@
+﻿@model SistemUpravljanjaOdsustvaZaposlenih.Web.Data.TipOdsustva
+
+@{
+    ViewData["Title"] = "Kreiraj";
+}
+
+<h1>Kreiraj</h1>
+
+<h4>Tip Odsustva</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Ime" class="control-label"></label>
+                <input asp-for="Ime" class="form-control" />
+                <span asp-validation-for="Ime" class="text-danger"></span>
+            </div>
+            <br/>
+            <div class="form-group">
+                <label asp-for="BrojDana" class="control-label"></label>
+                <input asp-for="BrojDana" class="form-control" />
+                <span asp-validation-for="BrojDana" class="text-danger"></span>
+            </div>
+            <br/>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-success" />
+                <a asp-action="Index" class="btn btn-primary">Vrati se na listu</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

@@ -8,6 +8,9 @@ namespace SistemUpravljanjaOdsustvaZaposlenih.Web.Data
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {
+
         }
+
+        public DbSet<TipOdsustva> TipOdsustva{ get; set; } 
     }
 }

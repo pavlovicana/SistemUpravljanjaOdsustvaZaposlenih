@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SistemUpravljanjaOdsustvaZaposlenih.Web.Data;
 
@@ -11,9 +12,11 @@ using SistemUpravljanjaOdsustvaZaposlenih.Web.Data;
 namespace SistemUpravljanjaOdsustvaZaposlenih.Web.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250111100719_DodavanjeTabeleTipOdsustva")]
+    partial class DodavanjeTabeleTipOdsustva
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

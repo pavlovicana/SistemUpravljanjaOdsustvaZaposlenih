@@ -1,0 +1,36 @@
+﻿@model SistemUpravljanjaOdsustvaZaposlenih.Web.Data.TipOdsustva
+
+@{
+    ViewData["Title"] = "Promeni tip odsustva";
+}
+
+<h1>Promeni</h1>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" />
+            <div class="form-group">
+                <label asp-for="Ime" class="control-label"></label>
+                <input asp-for="Ime" class="form-control" />
+                <span asp-validation-for="Ime" class="text-danger"></span>
+            </div>
+            <br/>
+            <div class="form-group">
+                <label asp-for="BrojDana" class="control-label"></label>
+                <input asp-for="BrojDana" class="form-control" />
+                <span asp-validation-for="BrojDana" class="text-danger"></span>
+            </div>
+            <br/>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-warning" />
+                <a asp-action="Index" class="btn btn-primary">Vrati se na listu</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
