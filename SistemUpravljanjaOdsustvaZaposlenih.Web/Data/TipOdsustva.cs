@@ -11,10 +11,5 @@ namespace SistemUpravljanjaOdsustvaZaposlenih.Web.Data
         public string Ime { get; set; }
         public int BrojDana { get; set; }
 
-
-
-
-
-
     }
 }

@@ -1,29 +1,31 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using SistemUpravljanjaOdsustvaZaposlenih.Web.Data;
+using SistemUpravljanjaOdsustvaZaposlenih.Web.Models.TipOdsustva;
+using SistemUpravljanjaOdsustvaZaposlenih.Web.Services;
 
 namespace SistemUpravljanjaOdsustvaZaposlenih.Web.Controllers
 {
-    public class TipOdsustvasController : Controller
+    public class TipOdsustvasController(ISistemOdsustvaServisi _sistemOdsustvaServisi) : Controller
     {
-        private readonly ApplicationDbContext _context; //referenca ka klasi DbContext //patern Dependency Injection//zavisnost klasa
+        
+        private const string NameExistsValidationMessage= "Ovo ime vec postoji u bazi.";
 
-        public TipOdsustvasController(ApplicationDbContext context)
-        {
-            _context = context;
-        }
+
 
         // GET: TipOdsustvas //fetch the data from the database - representation of table in database
         public async Task<IActionResult> Index()
         {
-            //var data = SELECT * FROM TipOsustva
-            var data = await _context.TipOdsustva.ToListAsync();
-            return View(data);
+            var viewData = await _sistemOdsustvaServisi.IspisiSveAsync();       
+            return View(viewData);
+           
         }
 
         // GET: TipOdsustvas/Details/5
@@ -35,8 +37,8 @@ namespace SistemUpravljanjaOdsustvaZaposlenih.Web.Controllers
             }
 
             //Select * from TipOdsustva WHERE Id = @id
-            var tipOdsustva = await _context.TipOdsustva
-                .FirstOrDefaultAsync(m => m.Id == id); //lambda expression
+            var tipOdsustva = await _sistemOdsustvaServisi.IspisiAsync<TipOdsustvaReadOnlyVM>(id.Value);
+
             if (tipOdsustva == null)
             {
                 return NotFound(); //404 Error if id is not found
@@ -53,18 +55,26 @@ namespace SistemUpravljanjaOdsustvaZaposlenih.Web.Controllers
 
         // POST: TipOdsustvas/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
+        //Overposting is enableing someone to add data from the browser when inspect element..
+        //Overposting is letting to much data to come in.
+        //because of that TipOdsustvaCreateVM nema Id properti.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Ime,BrojDana")] TipOdsustva tipOdsustva)
+        public async Task<IActionResult> Create(TipOdsustvaCreateVM tipOdsustvaCreateVM)
         {
+            //Adding custom validation and model state
+            if (await _sistemOdsustvaServisi.ProveriDaLiTipOdsustvaPostoji(tipOdsustvaCreateVM.Ime))
+            {
+                ModelState.AddModelError(nameof(tipOdsustvaCreateVM.Ime), NameExistsValidationMessage);
+            }
+
             if (ModelState.IsValid)
             {
-                _context.Add(tipOdsustva);
-                await _context.SaveChangesAsync();
+                _sistemOdsustvaServisi.Create(tipOdsustvaCreateVM);
                 return RedirectToAction(nameof(Index));
             }
-            return View(tipOdsustva);
+            return View(tipOdsustvaCreateVM);
         }
 
         // GET: TipOdsustvas/Edit/5
@@ -74,13 +84,15 @@ namespace SistemUpravljanjaOdsustvaZaposlenih.Web.Controllers
             {
                 return NotFound();
             }
+            var tipOdsustva = await _sistemOdsustvaServisi.IspisiAsync<TipOdsustvaEditVM>(id.Value);
 
-            var tipOdsustva = await _context.TipOdsustva.FindAsync(id);
             if (tipOdsustva == null)
             {
-                return NotFound();
+                return NotFound(); //404 Error if id is not found
             }
+
             return View(tipOdsustva);
+
         }
 
         // POST: TipOdsustvas/Edit/5
@@ -88,23 +100,28 @@ namespace SistemUpravljanjaOdsustvaZaposlenih.Web.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Ime,BrojDana")] TipOdsustva tipOdsustva)
+        public async Task<IActionResult> Edit(int id, TipOdsustvaEditVM tipOdsustvaEditVM)
         {
-            if (id != tipOdsustva.Id)
+            if (id != tipOdsustvaEditVM.Id)
             {
                 return NotFound();
+            }
+
+            if (await _sistemOdsustvaServisi.ProveriDaLiTipOdsustvaPostojiEdit(tipOdsustvaEditVM))
+            {
+                ModelState.AddModelError(nameof(tipOdsustvaEditVM.Ime), NameExistsValidationMessage);
             }
 
             if (ModelState.IsValid)
             {
                 try
                 {
-                    _context.Update(tipOdsustva);
-                    await _context.SaveChangesAsync();
+
+                    await _sistemOdsustvaServisi.Edit(tipOdsustvaEditVM);   
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!TipOdsustvaExists(tipOdsustva.Id))
+                    if (!_sistemOdsustvaServisi.TipOdsustvaExists(tipOdsustvaEditVM.Id))
                     {
                         return NotFound();
                     }
@@ -115,8 +132,8 @@ namespace SistemUpravljanjaOdsustvaZaposlenih.Web.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(tipOdsustva);
-        }
+            return View(tipOdsustvaEditVM);
+        }   
 
         // GET: TipOdsustvas/Delete/5
         public async Task<IActionResult> Delete(int? id)
@@ -126,14 +143,14 @@ namespace SistemUpravljanjaOdsustvaZaposlenih.Web.Controllers
                 return NotFound();
             }
 
-            var tipOdsustva = await _context.TipOdsustva
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var tipOdsustva = await _sistemOdsustvaServisi.IspisiAsync<TipOdsustvaReadOnlyVM>(id.Value);
+
             if (tipOdsustva == null)
             {
-                return NotFound();
+                return NotFound(); //404 Error if id is not found
             }
-
             return View(tipOdsustva);
+
         }
 
         // POST: TipOdsustvas/Delete/5
@@ -141,19 +158,8 @@ namespace SistemUpravljanjaOdsustvaZaposlenih.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var tipOdsustva = await _context.TipOdsustva.FindAsync(id);
-            if (tipOdsustva != null)
-            {
-                _context.TipOdsustva.Remove(tipOdsustva);
-            }
-
-            await _context.SaveChangesAsync();
+            await _sistemOdsustvaServisi.Obrisi(id);
             return RedirectToAction(nameof(Index));
-        }
-
-        private bool TipOdsustvaExists(int id)
-        {
-            return _context.TipOdsustva.Any(e => e.Id == id);
         }
     }
 }
