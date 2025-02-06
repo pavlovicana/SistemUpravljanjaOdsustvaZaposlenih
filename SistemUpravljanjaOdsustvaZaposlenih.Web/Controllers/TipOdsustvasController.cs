@@ -13,6 +13,7 @@ using SistemUpravljanjaOdsustvaZaposlenih.Web.Services;
 
 namespace SistemUpravljanjaOdsustvaZaposlenih.Web.Controllers
 {
+    [Authorize(Roles = Roles.Administrator)]
     public class TipOdsustvasController(ISistemOdsustvaServisi _sistemOdsustvaServisi) : Controller
     {
         

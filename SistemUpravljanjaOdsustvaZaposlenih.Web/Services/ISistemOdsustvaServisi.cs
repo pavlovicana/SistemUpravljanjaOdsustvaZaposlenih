@@ -3,7 +3,8 @@
 namespace SistemUpravljanjaOdsustvaZaposlenih.Web.Services
 {
 
-    //dodat je ISistemOdsustva interfejs jer klasa koja zavisi od druge klase, ne sme direktno da zavisi od implementacije, nego od ugovora 
+    //dodat je ISistemOdsustva interfejs jer klasa koja zavisi od druge klase, ne sme direktno da zavisi od implementacije, nego od ugovora, 
+    //nivo apstrakcije
     public interface ISistemOdsustvaServisi
     {
         Task Create(TipOdsustvaCreateVM model);
